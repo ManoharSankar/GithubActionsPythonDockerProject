@@ -1,22 +1,32 @@
 name: Build (Docker)
+
 on:
-    push:
-        branches: ["main"]
+  push:
+    branches: [ "main" ]
+
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        
-        steps:
-          - uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
 
-          - name: Build Docker image
-            run: docker build -t site-builder .
+    steps:
+      - uses: actions/checkout@v4
 
-          - name: Run the build container
-            run: docker run --rm -v ${{ github.workspace }}/site:/app/site site-builder
+      - name: Create site directory
+        run: mkdir -p site
 
-          - name: Upload Artifact
-            uses: actions/upload-pages-artifact@v3
-            with:
-                path: site
+      - name: Build Docker image
+        run: docker build -t site-builder .
 
+      - name: Run build container
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/site:/app/site" \
+            site-builder
+
+      - name: Verify site output
+        run: ls -R site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
