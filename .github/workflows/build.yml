@@ -26,6 +26,7 @@ jobs:
       - name: Verify site output
         run: ls -R site
 
+      # ✅ THIS IS THE IMPORTANT PART
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
