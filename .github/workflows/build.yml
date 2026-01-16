@@ -1,0 +1,22 @@
+name: Build (Docker)
+on:
+    push:
+        branches: ["main"]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        
+        steps:
+          - uses: actions/checkout@v4
+
+          - name: Build Docker image
+            run: docker build -t site-builder .
+
+          - name: Run the build container
+            run: docker run --rm -v ${{ github.workspace }}/site:/app/site site-builder
+
+          - name: Upload Artifact
+            uses: actions/upload-pages-artifact@v3
+            with:
+                path: site
+
