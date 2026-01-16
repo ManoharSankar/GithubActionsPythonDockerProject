@@ -1,4 +1,4 @@
-name: Build & Deploy Pages
+name: Build & Deploy GitHub Pages
 
 on:
   push:
@@ -12,30 +12,36 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - run: mkdir -p site
+      - name: Build Docker image
+        run: docker build -t site-builder .
 
-      - run: docker build -t site-builder .
-
-      - run: |
+      - name: Run site build
+        run: |
           docker run --rm \
             -v "${{ github.workspace }}/site:/app/site" \
             site-builder
 
-      - run: |
+      - name: Verify site output
+        run: |
           ls -la site
           test -f site/index.html
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     environment:
       name: github-pages
+
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
